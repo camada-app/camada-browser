@@ -1,0 +1,43 @@
+{
+  "version": "0.0.1",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup && node scripts/make-iife-string.mjs",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "check": "tsc --noEmit"
+  },
+  "name": "@camada/browser",
+  "description": "camada fingerprint beacon: browser module + self-initializing IIFE served first-party by the backend SDKs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./iife": "./dist/auto.global.js",
+    "./iife-string": {
+      "types": "./dist/iife-string.d.ts",
+      "import": "./dist/iife-string.js",
+      "require": "./dist/iife-string.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "tsup": "^8.3.5",
+    "vitest": "^3.0.0",
+    "jsdom": "^25.0.1"
+  }
+}
