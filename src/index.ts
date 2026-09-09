@@ -1,4 +1,4 @@
-// @camada/browser — TypeScript port of the collector's fp-beacon.js.
+// @camada/browser — the camada beacon.
 // Runs in the visitor's browser. Collects device, engine, automation and interaction
 // signals, waits two seconds for human input, posts once to the configured same-origin
 // endpoint (and again on pagehide). No cookies read, no storage written, no third-party calls.
@@ -7,7 +7,9 @@
 // feedBeacon() (edge-analyst/src/features.js) — the exact top-level keys (rid, ts, scr,
 // win, dpr, tz, tzo, lang, langs, plat, cores, mem, touch, ua, dnt, cookies, conn, gl,
 // cv, mf, auto, vis, focus, timing, paint, input, and hi merged before the delayed send)
-// must not be renamed or removed.
+// must not be renamed or removed. `sdk` ("<package>/<version>") is read by the analyst's
+// freshness, not the scorer: it is how a project's dashboard learns which beacon build runs.
+import { SDK_ID } from './version';
 
 export interface InitBeaconOptions {
   /** Same-origin path (or URL) the payload is POSTed to, e.g. '/_cam/fp'. */
@@ -98,7 +100,7 @@ export function initBeacon({ endpoint, rid }: InitBeaconOptions): void {
     const paint = safe(() => { const p = performance.getEntriesByType('paint'); return p.length ? Math.round(p[p.length - 1].startTime) : null; });
     const conn = safe(() => n.connection) || ({} as Record<string, unknown>);
     return {
-      rid: ridVal, ts: Date.now(),
+      sdk: SDK_ID, rid: ridVal, ts: Date.now(),
       scr: safe(() => [screen.width, screen.height, screen.availWidth, screen.availHeight, screen.colorDepth]),
       win: safe(() => [window.innerWidth, window.innerHeight, window.outerWidth, window.outerHeight]),
       dpr: safe(() => window.devicePixelRatio),
