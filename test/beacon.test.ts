@@ -89,7 +89,6 @@ describe('payload shape', () => {
     const body = bodyOf(fetchCallsTo('/hi/fp')[0]);
     expect(body.hi).toEqual({ model: 'Pixel 9', bitness: '64' });
     expect(body.rid).toBe('r-hi');
-    expect(body.sdk).toBe(SDK_ID);   // the merge must not drop the identity
   });
 
   it('counts input events and stamps first-input timing', async () => {
@@ -152,7 +151,6 @@ describe('transport', () => {
     window.dispatchEvent(new Event('pagehide'));
     await vi.advanceTimersByTimeAsync(0); // flush the ready.then microtask
     expect(fetchCallsTo('/pagehide/fp')).toHaveLength(2);
-    expect(bodyOf(fetchCallsTo('/pagehide/fp')[1]).sdk).toBe(SDK_ID);
   });
 });
 

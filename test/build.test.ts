@@ -9,13 +9,13 @@ import { fileURLToPath } from 'node:url';
 import { name, version } from '../package.json';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
+// iife-string.* hold the minified IIFE as a JSON string, so its quotes arrive escaped.
+const literal = (s: string) => new RegExp(`\\\\?"${s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\\\?"`);
 
 describe.skipIf(!existsSync(dist + 'auto.global.js'))('built artefacts', () => {
   for (const file of ['auto.global.js', 'iife-string.js', 'iife-string.cjs', 'index.js', 'index.cjs']) {
     it(`${file} carries ${name} ${version} inlined`, () => {
       const src = readFileSync(dist + file, 'utf8');
-      // iife-string.* hold the minified IIFE as a JSON string, so its quotes arrive escaped.
-      const literal = (s: string) => new RegExp(`\\\\?"${s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}\\\\?"`);
       expect(src).toMatch(literal(name));
       expect(src).toMatch(literal(version));
       expect(src).not.toMatch(/(from|require\()\s*["'][^"']*package\.json/);   // inlined, never resolved at runtime
