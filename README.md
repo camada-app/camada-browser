@@ -65,8 +65,10 @@ This is the intended production path, and `@camada/node`, `@camada/next` and
 beacon at the sibling `fpPath` (`/_cam/fp`, at most 32 KB, answers 204) and ships it
 inside its event batch as a `sig: 1` row stamped with the client IP it resolved
 itself and its own `tap` — one request per flush at the analyst, not one per page
-view. Both endpoints sit behind the SDK's verdict (a blocked client gets 403) and
-stand down when the project turns the beacon off in its settings.
+view. Both endpoints sit behind the SDK's verdict (a blocked client gets 403). When
+the project turns the beacon off in its settings `@camada/node` and `@camada/hono`
+stand both endpoints down; `@camada/next` stops serving `b.js` (its `fp` route still
+relays a body a cached script posts until that cache expires).
 
 The `fpPath` must live in the `scriptPath`'s directory: the self-initializing
 script derives the POST target by replacing the last segment of its own URL with
@@ -84,8 +86,10 @@ res.setHeader('cache-control', 'public, max-age=3600');
 res.end(beaconSource);
 ```
 
-The SDKs resolve that import at runtime through the `file:` link, so rebuilding
-this package is what puts a new beacon on the wire — no SDK rebuild needed.
+The SDK packages mark this import external, so they need no rebuild — but the
+import is resolved where the application is bundled: a Worker inlines the IIFE at
+`wrangler deploy` and a Next app at `next build`, so redeploy those after rebuilding
+this package; a plain-Node process picks the new `dist/` up on restart.
 `@camada/browser/iife` resolves to the raw `dist/auto.global.js` file for setups
 that prefer serving the file itself.
 
