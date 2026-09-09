@@ -49,7 +49,7 @@ initBeacon({ endpoint: '/_cam/fp', rid: pageViewRequestId });
 
 - `endpoint` — same-origin path the payload is POSTed to.
 - `rid` (optional) — request id correlating the beacon with the page view that
-  served it; defaults to the empty string on the wire.
+  served it; `null` on the wire when absent.
 
 Self-initializing script (no bundler on the page): serve `dist/auto.global.js`
 as a classic `<script src>`. It reads its own script URL — the `r` query param
@@ -66,9 +66,9 @@ beacon at the sibling `fpPath` (`/_cam/fp`, at most 32 KB, answers 204) and ship
 inside its event batch as a `sig: 1` row stamped with the client IP it resolved
 itself and its own `tap` — one request per flush at the analyst, not one per page
 view. Both endpoints sit behind the SDK's verdict (a blocked client gets 403). When
-the project turns the beacon off in its settings `@camada/node` and `@camada/hono`
-stand both endpoints down; `@camada/next` stops serving `b.js` (its `fp` route still
-relays a body a cached script posts until that cache expires).
+the project turns the beacon off in its settings all three adapters stand both
+endpoints down (a cached `b.js` may still post until its cache expires; the relay
+drops it).
 
 The `fpPath` must live in the `scriptPath`'s directory: the self-initializing
 script derives the POST target by replacing the last segment of its own URL with

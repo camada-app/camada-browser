@@ -83,7 +83,7 @@ function automation() {
  * fetch({ method: 'POST', keepalive: true }).
  */
 export function initBeacon({ endpoint, rid }: InitBeaconOptions): void {
-  const ridVal = rid || '';
+  const ridVal = rid || null;   // no ?r= on b.js: null, so the analyst's join sees an absent id rather than an empty one
   const t0 = performance.now();
   let moves = 0, scrolls = 0, keys = 0, touches = 0, clicks = 0;
   let firstInput: number | null = null;

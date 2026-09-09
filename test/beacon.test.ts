@@ -72,11 +72,11 @@ describe('payload shape', () => {
     expect(typeof body.mf).toBe('string');
   });
 
-  it('rid defaults to the empty string, matching the original beacon', async () => {
+  it('rid is null when b.js was loaded without ?r=', async () => {
     defineNav('sendBeacon', undefined);
     initBeacon({ endpoint: '/norid/fp' });
     await vi.advanceTimersByTimeAsync(2001);
-    expect(bodyOf(fetchCallsTo('/norid/fp')[0]).rid).toBe('');
+    expect(bodyOf(fetchCallsTo('/norid/fp')[0]).rid).toBeNull();
   });
 
   it('merges high-entropy client hints as hi before the delayed send', async () => {
