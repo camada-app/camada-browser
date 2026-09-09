@@ -1,9 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initBeacon } from '../src/index';
+import { name, version } from '../package.json';
 
-// Every top-level key feedBeacon() (edge-analyst/src/features.js) may look at.
+// The beacon's wire identity (SDK-G07): sendBeacon cannot set x-camada-sdk, so the body carries it.
+const SDK_ID = `${name}/${version}`;
+
+// Every top-level key feedBeacon() (edge-analyst/src/features.js) may look at, plus `sdk`
+// (read by freshness, not by the scorer).
 const PAYLOAD_KEYS = [
-  'rid', 'ts', 'scr', 'win', 'dpr', 'tz', 'tzo', 'lang', 'langs', 'plat', 'cores', 'mem',
+  'sdk', 'rid', 'ts', 'scr', 'win', 'dpr', 'tz', 'tzo', 'lang', 'langs', 'plat', 'cores', 'mem',
   'touch', 'ua', 'dnt', 'cookies', 'conn', 'gl', 'cv', 'mf', 'auto', 'vis', 'focus',
   'timing', 'paint', 'input',
 ] as const;
@@ -58,6 +63,7 @@ describe('payload shape', () => {
 
     const body = bodyOf(calls[0]);
     for (const key of PAYLOAD_KEYS) expect(body, `missing top-level key "${key}"`).toHaveProperty(key);
+    expect(body.sdk).toBe(SDK_ID);
     expect(body.rid).toBe('r-shape');
     expect(typeof body.ts).toBe('number');
     expect(body.input).toMatchObject({ moves: 0, scrolls: 0, keys: 0, touches: 0, clicks: 0, first: null });
@@ -83,6 +89,7 @@ describe('payload shape', () => {
     const body = bodyOf(fetchCallsTo('/hi/fp')[0]);
     expect(body.hi).toEqual({ model: 'Pixel 9', bitness: '64' });
     expect(body.rid).toBe('r-hi');
+    expect(body.sdk).toBe(SDK_ID);   // the merge must not drop the identity
   });
 
   it('counts input events and stamps first-input timing', async () => {
@@ -108,6 +115,15 @@ describe('transport', () => {
     expect(sendBeacon).toHaveBeenCalledTimes(1);
     expect((sendBeacon.mock.calls[0] as unknown[])[0]).toBe('/sb-ok/fp');
     expect(fetchCallsTo('/sb-ok/fp')).toHaveLength(0);
+    const blob = (sendBeacon.mock.calls[0] as unknown[])[1] as Blob;   // the only place this transport's body is inspected
+    expect(blob.type).toBe('application/json');
+    vi.useRealTimers();   // the beacon has fired; FileReader's load event needs real scheduling
+    const text = await new Promise<string>((resolve) => {   // jsdom's Blob has no text(); FileReader is what it does implement
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.readAsText(blob);
+    });
+    expect(JSON.parse(text).sdk).toBe(SDK_ID);
   });
 
   it('falls back to fetch keepalive POST when sendBeacon returns false', async () => {
@@ -136,6 +152,7 @@ describe('transport', () => {
     window.dispatchEvent(new Event('pagehide'));
     await vi.advanceTimersByTimeAsync(0); // flush the ready.then microtask
     expect(fetchCallsTo('/pagehide/fp')).toHaveLength(2);
+    expect(bodyOf(fetchCallsTo('/pagehide/fp')[1]).sdk).toBe(SDK_ID);
   });
 });
 
