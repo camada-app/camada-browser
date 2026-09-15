@@ -3,7 +3,7 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "files": [
     "dist",
@@ -35,9 +35,10 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "devDependencies": {
-    "typescript": "^5.7.2",
+    "@types/node": "^22.20.2",
+    "jsdom": "^25.0.1",
     "tsup": "^8.3.5",
-    "vitest": "^3.0.0",
-    "jsdom": "^25.0.1"
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
   }
 }
