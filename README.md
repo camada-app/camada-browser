@@ -25,17 +25,9 @@ from before 0.2.0 sends no `sdk` and is simply not versioned.
 
 ## Install
 
-Unpublished. Consume it from a sibling checkout via a `file:` dependency:
-
-```json
-{
-  "dependencies": {
-    "@camada/browser": "file:../camada-browser"
-  }
-}
+```sh
+npm install @camada/browser
 ```
-
-Run `npm run build` in this repo first so `dist/` exists.
 
 ## Quickstart
 
