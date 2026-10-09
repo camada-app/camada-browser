@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 (2026-10-09; follows 0.3.0)
+
+- Version-only release, in lockstep with `@camada/node` 0.3.1. Nothing changed for the browser.
+
 ## 0.3.0 (2026-10-04; follows 0.2.0)
 
 ### Changed
