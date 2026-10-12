@@ -14,5 +14,7 @@ writeFileSync(join(dist, 'iife-string.js'), `export default ${escaped};\n`);
 // assignment is a silent no-op interop nicety rather than a strict-mode TypeError.
 writeFileSync(join(dist, 'iife-string.cjs'), `module.exports = ${escaped};\nmodule.exports.default = module.exports;\n`);
 writeFileSync(join(dist, 'iife-string.d.ts'), `declare const s: string;\nexport default s;\n`);
+// The .cjs is `module.exports = <string>`, so its declaration is `export =` (an `export default` would claim a `.default` that only exists as interop sugar).
+writeFileSync(join(dist, 'iife-string.d.cts'), `declare const s: string;\nexport = s;\n`);
 
-console.log(`iife-string: ${source.length} bytes -> dist/iife-string.{js,cjs,d.ts}`);
+console.log(`iife-string: ${source.length} bytes -> dist/iife-string.{js,cjs,d.ts,d.cts}`);
