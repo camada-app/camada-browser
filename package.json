@@ -20,20 +20,37 @@
   "description": "camada fingerprint beacon: browser module + self-initializing IIFE served first-party by the backend SDKs",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./iife": "./dist/auto.global.js",
     "./iife-string": {
-      "types": "./dist/iife-string.d.ts",
-      "import": "./dist/iife-string.js",
-      "require": "./dist/iife-string.cjs"
+      "import": {
+        "types": "./dist/iife-string.d.ts",
+        "default": "./dist/iife-string.js"
+      },
+      "require": {
+        "types": "./dist/iife-string.d.cts",
+        "default": "./dist/iife-string.cjs"
+      }
     }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "iife-string": [
+        "./dist/iife-string.d.ts"
+      ]
+    }
+  },
   "devDependencies": {
     "@types/node": "^22.20.2",
     "jsdom": "^25.0.1",
