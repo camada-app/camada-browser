@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 (2026-10-26; follows 0.3.2)
+
+Version-only, in lockstep with `@camada/node` 0.4.0 (SDK-G08).
+
 ## 0.3.2 (2026-10-12; follows 0.3.1)
 
 ### Changed
