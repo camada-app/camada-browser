@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Beacon key `fr`: 1 when the document runs in a nested browsing context (`window.top !== window`), 0 at top level, null if the check throws. The analyst reads it with the joined request's Sec-Fetch-Dest; older beacons lack it. (camada-all-mln2)
+
 ## 0.4.0 (2026-10-26; follows 0.3.2)
 
 Version-only, in lockstep with `@camada/node` 0.4.0 (SDK-G08).

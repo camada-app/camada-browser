@@ -6,10 +6,12 @@
 // WIRE COMPATIBILITY: the payload shape below is consumed by the analysis pipeline's
 // feedBeacon() (edge-analyst/src/features.js) — the exact top-level keys (rid, ts, scr,
 // win, dpr, tz, tzo, lang, langs, plat, cores, mem, touch, ua, dnt, cookies, conn, gl,
-// cv, mf, auto, vis, focus, timing, paint, input, and hi merged before the delayed send)
-// must not be renamed or removed. `sdk` ("<package>/<version>") is read by the analyst's
+// cv, mf, auto, vis, focus, timing, paint, input, fr, and hi merged before the delayed send)
+// must not be renamed or removed. `fr` (1 = framed, 0 = top level, null = unknown) is read by the
+// analyst together with the joined request's Sec-Fetch-Dest; older beacons lack it and are read as unknown. `sdk` ("<package>/<version>") is read by the analyst's
 // freshness, not the scorer: it is how a project's dashboard learns which beacon build runs.
 import { SDK_ID } from './version';
+import { frameFlag } from './frame';
 
 export interface InitBeaconOptions {
   /** Same-origin path (or URL) the payload is POSTed to, e.g. '/_cam/fp'. */
@@ -121,6 +123,7 @@ export function initBeacon({ endpoint, rid }: InitBeaconOptions): void {
       focus: safe(() => (document.hasFocus() ? 1 : 0)),
       timing: nav ? [Math.round(nav.domContentLoadedEventEnd), Math.round(nav.loadEventEnd), Math.round(nav.responseEnd - nav.requestStart)] : null,
       paint: paint,
+      fr: safe(() => frameFlag(window)),
       input: { moves: moves, scrolls: scrolls, keys: keys, touches: touches, clicks: clicks, first: firstInput, at: Math.round(performance.now() - t0) },
     };
   }
