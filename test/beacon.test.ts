@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initBeacon } from '../src/index';
+import { frameFlag } from '../src/frame';
 import { name, version } from '../package.json';
 
 // The beacon's wire identity (SDK-G07): sendBeacon cannot set x-camada-sdk, so the body carries it.
@@ -10,7 +11,7 @@ const SDK_ID = `${name}/${version}`;
 const PAYLOAD_KEYS = [
   'sdk', 'rid', 'ts', 'scr', 'win', 'dpr', 'tz', 'tzo', 'lang', 'langs', 'plat', 'cores', 'mem',
   'touch', 'ua', 'dnt', 'cookies', 'conn', 'gl', 'cv', 'mf', 'auto', 'vis', 'focus',
-  'timing', 'paint', 'input',
+  'timing', 'paint', 'input', 'fr',
 ] as const;
 
 let fetchMock: ReturnType<typeof vi.fn>;
@@ -66,6 +67,7 @@ describe('payload shape', () => {
     expect(body.sdk).toBe(SDK_ID);
     expect(body.rid).toBe('r-shape');
     expect(typeof body.ts).toBe('number');
+    expect(body.fr).toBe(0);
     expect(body.input).toMatchObject({ moves: 0, scrolls: 0, keys: 0, touches: 0, clicks: 0, first: null });
     expect(body.auto).toHaveProperty('wd');
     expect(body.auto).toHaveProperty('cdc');
@@ -170,5 +172,23 @@ describe('resilience', () => {
     expect(body.rid).toBe('r-throw'); // …and the rest of the payload still ships
     expect(body).toHaveProperty('ua');
     expect(body).toHaveProperty('input');
+  });
+});
+
+describe('fr (frame flag)', () => {
+  it('frameFlag is 1 inside an iframe and 0 at top level', () => {
+    const f = document.createElement('iframe');
+    document.body.appendChild(f);
+    expect(frameFlag(f.contentWindow as Window)).toBe(1);
+    expect(frameFlag(window)).toBe(0);
+    f.remove();
+  });
+
+  it('fr is null when reading top throws', async () => {
+    defineNav('sendBeacon', undefined);
+    initBeacon({ endpoint: '/fr/fp', rid: 'r-fr' });
+    vi.stubGlobal('window', { get top() { throw new Error('boom'); } });
+    await vi.advanceTimersByTimeAsync(2001);
+    expect(bodyOf(fetchCallsTo('/fr/fp')[0]).fr).toBeNull();
   });
 });
