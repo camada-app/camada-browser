@@ -1,5 +1,7 @@
 # @camada/browser
 
+[Bot detection](https://www.camada.app/bot-detection) · [Bot signal test](https://www.camada.app/tools/bot-test) · [Docs](https://www.camada.app/docs) · [Pricing](https://www.camada.app/pricing).
+
 The camada fingerprint beacon as a TypeScript package: a browser module plus a
 self-initializing IIFE build that backend SDKs serve first-party.
 
@@ -17,7 +19,7 @@ key, so the top-level keys are pinned (`test/beacon.test.ts` guards them): `sdk`
 `focus`, `timing`, `paint`, `input`, plus `hi` (high-entropy client hints) when the
 browser answers in time.
 
-`sdk` is `"@camada/browser/<version>"` — the beacon's own build, stamped at build
+`sdk` is `"@camada/browser/<version>"`, the beacon's own build, stamped at build
 time. `sendBeacon` cannot set headers, so this is how the analyst's freshness learns
 which beacon a project runs (the server SDKs report themselves through
 `x-camada-sdk`); the dashboard uses it to flag an outdated beacon. A `b.js` cached
@@ -39,12 +41,12 @@ import { initBeacon } from '@camada/browser';
 initBeacon({ endpoint: '/_cam/fp', rid: pageViewRequestId });
 ```
 
-- `endpoint` — same-origin path the payload is POSTed to.
-- `rid` (optional) — request id correlating the beacon with the page view that
+- `endpoint`: same-origin path the payload is POSTed to.
+- `rid` (optional): request id correlating the beacon with the page view that
   served it; `null` on the wire when absent.
 
 Self-initializing script (no bundler on the page): serve `dist/auto.global.js`
-as a classic `<script src>`. It reads its own script URL — the `r` query param
+as a classic `<script src>`. It reads its own script URL: the `r` query param
 becomes the rid, and the URL's final path segment is replaced with `fp` to form
 the endpoint (`/_cam/b.js?r=abc` → POST `/_cam/fp` with `rid: "abc"`). If
 `document.currentScript` is unavailable it does nothing, silently.
@@ -56,8 +58,8 @@ This is the intended production path, and `@camada/node`, `@camada/next` and
 `scriptPath` (`/_cam/b.js`; `@camada/next` uses `/api/camada/b.js`), accepts the
 beacon at the sibling `fpPath` (`/_cam/fp`, at most 32 KB, answers 204) and ships it
 inside its event batch as a `sig: 1` row stamped with the client IP it resolved
-itself and its own `tap` — one request per flush at the analyst, not one per page
-view. Both endpoints sit behind the SDK's verdict (a blocked client gets 403). When
+itself and its own `tap` (one request per flush at the analyst, not one per page
+view). Both endpoints sit behind the SDK's verdict (a blocked client gets 403). When
 the project turns the beacon off in its settings all three adapters stand both
 endpoints down (a cached `b.js` may still post until its cache expires; the relay
 drops it).
@@ -78,7 +80,7 @@ res.setHeader('cache-control', 'public, max-age=3600');
 res.end(beaconSource);
 ```
 
-The SDK packages mark this import external, so they need no rebuild — but the
+The SDK packages mark this import external, so they need no rebuild, though the
 import is resolved where the application is bundled: a Worker inlines the IIFE at
 `wrangler deploy` and a Next app at `next build`, so redeploy those after rebuilding
 this package; a plain-Node process picks the new `dist/` up on restart.
@@ -93,3 +95,12 @@ npm run build   # tsup (ESM + CJS + IIFE) + dist/iife-string.{js,cjs,d.ts}
 npm test        # vitest (jsdom)
 npm run check   # tsc --noEmit
 ```
+
+## Docs and links
+
+Read the guides on [camada.app](https://www.camada.app/docs).
+
+- [Bot detection](https://www.camada.app/bot-detection): see how the first-party beacon pairs with server events.
+- [Bot signal test](https://www.camada.app/tools/bot-test): run live browser, WebGL, and TLS checks in your own tab.
+- [Frameworks](https://www.camada.app/frameworks): serve `/_cam/b.js` from Node, Next.js, Hono, or Web-fetch SDKs.
+- [Pricing](https://www.camada.app/pricing): compare the free tier and paid plans.

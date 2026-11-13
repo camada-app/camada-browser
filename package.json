@@ -18,6 +18,29 @@
   },
   "name": "@camada/browser",
   "description": "camada fingerprint beacon: browser module + self-initializing IIFE served first-party by the backend SDKs",
+  "homepage": "https://www.camada.app/bot-detection",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camada-app/camada-browser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/camada-app/camada-browser/issues"
+  },
+  "keywords": [
+    "camada",
+    "bot-detection",
+    "bot-protection",
+    "browser-fingerprinting",
+    "headless-browser",
+    "webdriver",
+    "playwright",
+    "credential-stuffing",
+    "account-takeover",
+    "rate-limiting",
+    "proof-of-work",
+    "ai-scraper",
+    "security"
+  ],
   "exports": {
     ".": {
       "import": {
