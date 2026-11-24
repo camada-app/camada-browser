@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 (2026-11-24; follows 0.4.0)
+
+In lockstep with `@camada/node` 0.5.0 (SDK-G08).
 
 ### Added
 
